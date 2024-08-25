@@ -31,8 +31,7 @@ def apology(message, code=400):
             s = s.replace(old, new)
         return s
 
-    return render_template("apology.html",
-                           top=code, bottom=escape(message)), code
+    return render_template("apology.html", top=code, bottom=escape(message)), code
 
 
 def login_required(f):
@@ -61,8 +60,7 @@ def lookup(symbol):
 
     # Yahoo Finance API
     url = (
-        f"https://query1.finance.yahoo.com/v7/finance/download/{
-            urllib.parse.quote_plus(symbol)}"
+        f"https://query1.finance.yahoo.com/v7/finance/download/{urllib.parse.quote_plus(symbol)}"
         f"?period1={int(start.timestamp())}"
         f"&period2={int(end.timestamp())}"
         f"&interval=1d&events=history&includeAdjustedClose=true"
@@ -73,16 +71,14 @@ def lookup(symbol):
         response = requests.get(
             url,
             cookies={"session": str(uuid.uuid4())},
-            headers={"Accept": "*/*",
-                     "User-Agent": request.headers.get("User-Agent")},
+            headers={"Accept": "*/*", "User-Agent": request.headers.get("User-Agent")},
         )
         response.raise_for_status()
 
         # CSV header: Date,Open,High,Low,Close,Adj Close,Volume
-        quotes = list(csv.DictReader(
-            response.content.decode("utf-8").splitlines()))
+        quotes = list(csv.DictReader(response.content.decode("utf-8").splitlines()))
         price = round(float(quotes[-1]["Adj Close"]), 2)
-        return {'symbol': symbol, 'price': price}
+        return {"price": price, "symbol": symbol}
     except (KeyError, IndexError, requests.RequestException, ValueError):
         return None
 
